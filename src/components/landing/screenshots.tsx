@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
-const screenshots = PlaceHolderImages.filter(img => img.id.startsWith("app-"));
+const screenshots = PlaceHolderImages.filter((img) => img.id.startsWith("app-"));
 
 function PhoneMockup({ children }: { children: React.ReactNode }) {
   return (
@@ -17,32 +17,37 @@ function PhoneMockup({ children }: { children: React.ReactNode }) {
   );
 }
 
-
 export function Screenshots() {
   return (
     <section id="screenshots" className="w-full py-20 md:py-32">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Een kijkje in de app</h2>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">
+              A look inside the app
+            </h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Zie hoe LinkUp het plannen van A tot Z vereenvoudigt. Van voorstel tot definitieve keuze.
+              See how LinkUp makes planning simple from start to finish — from
+              suggestions to the final choice.
             </p>
           </div>
         </div>
         <div className="mx-auto grid max-w-sm items-center gap-8 py-12 sm:max-w-4xl sm:grid-cols-2 lg:max-w-none lg:grid-cols-3 lg:gap-12">
           {screenshots.map((screenshot, index) => (
-             <div key={screenshot.id} className="transform transition-transform duration-300 hover:scale-105">
-                <PhoneMockup>
-                    <Image
-                        src={screenshot.imageUrl}
-                        alt={screenshot.description}
-                        data-ai-hint={screenshot.imageHint}
-                        width={375}
-                        height={812}
-                        className="object-cover w-full h-full"
-                    />
-                </PhoneMockup>
+            <div
+              key={screenshot.id}
+              className="transform transition-transform duration-300 hover:scale-105"
+            >
+              <PhoneMockup>
+                <Image
+                  src={screenshot.imageUrl}
+                  alt={screenshot.description}
+                  data-ai-hint={screenshot.imageHint}
+                  width={375}
+                  height={812}
+                  className="object-cover w-full h-full"
+                />
+              </PhoneMockup>
             </div>
           ))}
         </div>

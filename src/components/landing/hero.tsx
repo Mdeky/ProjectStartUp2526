@@ -7,14 +7,13 @@ export function Hero() {
         <div className="mx-auto grid max-w-4xl items-center gap-6 lg:grid-cols-2 lg:gap-12">
           <div className="space-y-4">
             <div className="inline-block rounded-lg bg-accent/20 px-3 py-1 text-sm font-medium text-accent-foreground">
-              Nieuwe Manier van Plannen
+              The new way of planning
             </div>
             <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
-              Plan samen, beslis slim.
+              Plan together, decide clever
             </h1>
             <p className="max-w-[600px] text-muted-foreground md:text-xl">
-              LinkUp maakt groepsbeslissingen leuk en efficiënt. Geen eindeloze discussies meer. Swipe, stem en geniet van jullie perfecte plan.
-            </p>
+              LinkUp makes group decisions fun and efficient. No more endless discussions. Swipe, vote, and enjoy your perfect plan.            </p>
           </div>
           <div className="w-full">
             <SignUpForm />
