@@ -1,7 +1,23 @@
 import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
-const screenshots = PlaceHolderImages.filter((img) => img.id.startsWith("app-"));
+// JOUW eigen app screenshots uit /public
+const screenshots = [
+  {
+    id: "planner",
+    src: "/LinkUp_Planner.png",
+    alt: "LinkUp planning screen",
+  },
+  {
+    id: "swipe",
+    src: "/LinkUp_Swipe.png",
+    alt: "LinkUp swipe screen",
+  },
+  {
+    id: "rating",
+    src: "/LinkUp_Rating.png",
+    alt: "LinkUp rating screen",
+  },
+];
 
 function PhoneMockup({ children }: { children: React.ReactNode }) {
   return (
@@ -27,22 +43,23 @@ export function Screenshots() {
               A look inside the app
             </h2>
             <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              See how LinkUp makes planning simple from start to finish — from
-              suggestions to the final choice.
+              See how LinkUp makes planning simple from start to finish —
+              from suggestions to the final choice.
             </p>
           </div>
         </div>
+
+        {/* GRID of screenshots */}
         <div className="mx-auto grid max-w-sm items-center gap-8 py-12 sm:max-w-4xl sm:grid-cols-2 lg:max-w-none lg:grid-cols-3 lg:gap-12">
-          {screenshots.map((screenshot, index) => (
+          {screenshots.map((screen) => (
             <div
-              key={screenshot.id}
+              key={screen.id}
               className="transform transition-transform duration-300 hover:scale-105"
             >
               <PhoneMockup>
                 <Image
-                  src={screenshot.imageUrl}
-                  alt={screenshot.description}
-                  data-ai-hint={screenshot.imageHint}
+                  src={screen.src}
+                  alt={screen.alt}
                   width={375}
                   height={812}
                   className="object-cover w-full h-full"
