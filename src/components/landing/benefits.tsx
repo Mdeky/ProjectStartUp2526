@@ -4,12 +4,12 @@ const benefits = [
   {
     title: "Less talking, more doing",
     description:
-      "No more endless group chats about ‘where are we eating?’. LinkUp makes choosing quick and easy so you can just enjoy the moment.",
+      "No more endless group chats about ‘where are we going?’. LinkUp makes choosing quick and easy so you can just enjoy the moment.",
   },
   {
     title: "Made for every group",
     description:
-      "Planning a weekend with friends, a family dinner, or a team night out? LinkUp works perfectly for any kind of plan.",
+      "Planning a trip with friends or organizing a team-building activity? LinkUp makes vacation planning effortless and fun.",
   },
   {
     title: "Smart and simple planning",

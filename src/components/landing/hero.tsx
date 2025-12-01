@@ -13,8 +13,11 @@ export function Hero() {
               Plan together, decide clever
             </h1>
             <p className="max-w-[600px] text-muted-foreground md:text-xl">
-              LinkUp makes group decisions fun and efficient. No more endless discussions. Swipe, vote, and enjoy your perfect plan.            </p>
+              LinkUp makes group decisions fun and efficient. No more endless
+              discussions. Swipe, vote, and enjoy your perfect plan.
+            </p>
           </div>
+
           <div className="w-full">
             <SignUpForm />
           </div>

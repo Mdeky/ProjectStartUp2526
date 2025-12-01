@@ -6,7 +6,7 @@ const features = [
     icon: <GalleryHorizontal className="h-8 w-8 text-primary" />,
     title: "Swipe to choose",
     description:
-      "Just like Tinder, but for planning hangouts. Swipe through suggestions and show what you like right away.",
+      "Just like Tinder, but for planning vacations. Swipe through suggestions and show what you like right away.",
   },
   {
     icon: <Star className="h-8 w-8 text-primary" />,
@@ -24,7 +24,7 @@ const features = [
     icon: <CalendarCheck className="h-8 w-8 text-primary" />,
     title: "Stress-free planning",
     description:
-      "From restaurants to weekend trips, plan any group activity fast, fun, and totally hassle-free.",
+      "From family vacations to teambuilding trips. Plan fast, fun, and totally hassle-free.",
   },
 ];
 
