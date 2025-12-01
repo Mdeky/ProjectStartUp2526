@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
-import { signUpForPrerelease, type SignUpState } from '@/app/actions';
+import { useEffect, useRef, useState, FormEvent } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 import {
   Card,
@@ -18,14 +17,14 @@ import { Button } from '@/components/ui/button';
 import { Loader2, PartyPopper } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-const initialState: SignUpState = {
-  status: 'idle',
-  message: '',
+type Status = 'idle' | 'pending' | 'success' | 'error';
+
+type FieldErrors = {
+  name?: string[];
+  email?: string[];
 };
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
+function SubmitButton({ pending }: { pending: boolean }) {
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending ? (
@@ -41,35 +40,75 @@ function SubmitButton() {
 }
 
 export function SignUpForm() {
-  const [state, formAction] = useActionState(
-    signUpForPrerelease,
-    initialState
-  );
+  const [status, setStatus] = useState<Status>('idle');
+  const [message, setMessage] = useState('');
+  const [confirmation, setConfirmation] = useState<string | null>(null);
+  const [errors, setErrors] = useState<FieldErrors | null>(null);
+
   const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (state.status === 'success') {
-      formRef.current?.reset();
+  const pending = status === 'pending';
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    console.log('SUPABASE_URL =', process.env.NEXT_PUBLIC_SUPABASE_URL);
+    event.preventDefault();
+    setStatus('pending');
+    setMessage('');
+    setConfirmation(null);
+    setErrors(null);
+
+    const formData = new FormData(event.currentTarget);
+    const name = String(formData.get('name') ?? '').trim();
+    const email = String(formData.get('email') ?? '').trim();
+
+    const newErrors: FieldErrors = {};
+    if (!name) newErrors.name = ['Name is required'];
+    if (!email) newErrors.email = ['Email is required'];
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setStatus('error');
+      return;
     }
 
-    if (state.status === 'error' && state.message && !state.errors) {
+    const { error } = await supabase.from('registrations').insert({
+      name,
+      email,
+    });
+
+    if (error) {
+      console.error(error);
+      setStatus('error');
+      setMessage('Something went wrong while saving your signup.');
       toast({
         variant: 'destructive',
         title: 'Oh no! Something went wrong.',
-        description: state.message,
+        description: 'Please try again later.',
+      });
+    } else {
+      setStatus('success');
+      setConfirmation('Thanks for signing up! We will notify you as soon as LinkUp goes live.');
+      formRef.current?.reset();
+    }
+  };
+
+  useEffect(() => {
+    if (status === 'error' && message && !errors) {
+      toast({
+        variant: 'destructive',
+        title: 'Oh no! Something went wrong.',
+        description: message,
       });
     }
-  }, [state, toast]);
+  }, [status, message, errors, toast]);
 
-  if (state.status === 'success' && state.confirmation) {
+  if (status === 'success' && confirmation) {
     return (
       <Card className="w-full max-w-md shadow-lg">
         <CardContent className="p-6 text-center">
           <PartyPopper className="mx-auto mb-4 h-12 w-12 text-accent" />
-          <p className="text-lg text-muted-foreground">
-            {state.confirmation}
-          </p>
+          <p className="text-lg text-muted-foreground">{confirmation}</p>
         </CardContent>
       </Card>
     );
@@ -84,14 +123,14 @@ export function SignUpForm() {
         </CardDescription>
       </CardHeader>
 
-      <form action={formAction} ref={formRef}>
+      <form onSubmit={handleSubmit} ref={formRef}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input id="name" name="name" placeholder="Your name" required />
-            {state.errors?.name && (
+            {errors?.name && (
               <p className="text-sm font-medium text-destructive">
-                {state.errors.name[0]}
+                {errors.name[0]}
               </p>
             )}
           </div>
@@ -105,16 +144,16 @@ export function SignUpForm() {
               placeholder="Your email address"
               required
             />
-            {state.errors?.email && (
+            {errors?.email && (
               <p className="text-sm font-medium text-destructive">
-                {state.errors.email[0]}
+                {errors.email[0]}
               </p>
             )}
           </div>
         </CardContent>
 
         <CardFooter className="flex flex-col items-start">
-          <SubmitButton />
+          <SubmitButton pending={pending} />
           <p className="mt-2 text-xs text-muted-foreground">
             We respect your privacy. No spam, ever.
           </p>
