@@ -1,13 +1,15 @@
 'use server';
 
 import { z } from 'zod';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { generatePersonalizedConfirmation } from '@/ai/flows/personalized-form-submission-confirmation';
+import fs from 'fs/promises';
+import path from 'path';
 
 const SignUpSchema = z.object({
-  name: z.string().min(2, { message: "Naam moet minimaal 2 karakters lang zijn." }).max(50, { message: "Naam is te lang." }),
-  email: z.string().email({ message: "Voer een geldig e-mailadres in." }),
+  name: z
+    .string()
+    .min(2, { message: 'Naam moet minimaal 2 karakters lang zijn.' })
+    .max(50, { message: 'Naam is te lang.' }),
+  email: z.string().email({ message: 'Voer een geldig e-mailadres in.' }),
 });
 
 export type SignUpState = {
@@ -20,13 +22,35 @@ export type SignUpState = {
   };
 };
 
+const dataFile = path.join(
+  process.cwd(),
+  'src',
+  'data',
+  'prerelease-signups.json'
+);
+
+async function readSignups() {
+  try {
+    const file = await fs.readFile(dataFile, 'utf8');
+    return JSON.parse(file) as Array<{
+      name: string;
+      email: string;
+      createdAt: string;
+    }>;
+  } catch {
+    // Als bestand nog niet bestaat of leeg/corrupt is: begin met lege lijst
+    return [];
+  }
+}
+
+async function writeSignups(data: unknown) {
+  await fs.writeFile(dataFile, JSON.stringify(data, null, 2), 'utf8');
+}
+
 export async function signUpForPrerelease(
-  prevState: SignUpState,
+  _prevState: SignUpState,
   formData: FormData
 ): Promise<SignUpState> {
-  // This is a slow action to simulate network latency.
-  // await new Promise(resolve => setTimeout(resolve, 1000));
-  
   const validatedFields = SignUpSchema.safeParse({
     name: formData.get('name'),
     email: formData.get('email'),
@@ -43,35 +67,23 @@ export async function signUpForPrerelease(
   const { name, email } = validatedFields.data;
 
   try {
-    // Check if Firebase is configured
-    if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
-      console.warn("Firebase not configured. Skipping Firestore write. Using mock AI response.");
-      
-      const personalizedConfirmation = await generatePersonalizedConfirmation({ name });
-      
-      return {
-        status: 'success',
-        message: 'Success! (Mock Response)',
-        confirmation: personalizedConfirmation.confirmationMessage,
-      };
-    }
-      
-    await addDoc(collection(db, 'preregistrations'), {
+    const signups = await readSignups();
+
+    signups.push({
       name,
       email,
-      createdAt: serverTimestamp(),
+      createdAt: new Date().toISOString(),
     });
 
-    const { confirmationMessage } = await generatePersonalizedConfirmation({ name });
-    
+    await writeSignups(signups);
+
     return {
       status: 'success',
       message: 'Success!',
-      confirmation: confirmationMessage,
+      confirmation: 'Bedankt! Je staat op de prerelease-lijst.',
     };
-
   } catch (error) {
-    console.error('Firebase or AI Error:', error);
+    console.error('Error saving signup:', error);
     return {
       status: 'error',
       message: 'Er is iets misgegaan. Probeer het later opnieuw.',

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useEffect, useRef, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { signUpForPrerelease, type SignUpState } from '@/app/actions';
 
 import {
@@ -25,6 +25,7 @@ const initialState: SignUpState = {
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+
   return (
     <Button type="submit" className="w-full" disabled={pending}>
       {pending ? (
@@ -40,7 +41,10 @@ function SubmitButton() {
 }
 
 export function SignUpForm() {
-  const [state, formAction] = useFormState(signUpForPrerelease, initialState);
+  const [state, formAction] = useActionState(
+    signUpForPrerelease,
+    initialState
+  );
   const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
 
@@ -48,6 +52,7 @@ export function SignUpForm() {
     if (state.status === 'success') {
       formRef.current?.reset();
     }
+
     if (state.status === 'error' && state.message && !state.errors) {
       toast({
         variant: 'destructive',
@@ -61,8 +66,10 @@ export function SignUpForm() {
     return (
       <Card className="w-full max-w-md shadow-lg">
         <CardContent className="p-6 text-center">
-          <PartyPopper className="mx-auto h-12 w-12 text-accent mb-4" />
-          <p className="text-lg text-muted-foreground">{state.confirmation}</p>
+          <PartyPopper className="mx-auto mb-4 h-12 w-12 text-accent" />
+          <p className="text-lg text-muted-foreground">
+            {state.confirmation}
+          </p>
         </CardContent>
       </Card>
     );
@@ -76,6 +83,7 @@ export function SignUpForm() {
           Sign up and get notified as soon as LinkUp goes live.
         </CardDescription>
       </CardHeader>
+
       <form action={formAction} ref={formRef}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -87,6 +95,7 @@ export function SignUpForm() {
               </p>
             )}
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -103,6 +112,7 @@ export function SignUpForm() {
             )}
           </div>
         </CardContent>
+
         <CardFooter className="flex flex-col items-start">
           <SubmitButton />
           <p className="mt-2 text-xs text-muted-foreground">
